@@ -12,6 +12,7 @@
   h1 { font-size: 20px; margin: 8px 0 4px; }
   p { margin: 4px 0 20px; color: #666; font-size: 14px; }
   a.btn { display: block; max-width: 360px; margin: 10px auto; padding: 14px; border-radius: 10px; font-size: 17px; font-weight: 600; text-decoration: none; }
+  a.go { padding: 28px 14px; font-size: 22px; }
   a.go { background: #03c75a; color: #fff; }
   a.web { background: #fff; color: #03c75a; border: 1px solid #03c75a; }
   @media (prefers-color-scheme: dark) { a.web { background: #111; } }
@@ -19,7 +20,7 @@
 </head>
 <body>
 <h1 id="name">길안내</h1>
-<p id="msg">네이버 지도 내비를 여는 중…</p>
+<p id="msg">잠시만요…</p>
 <a class="btn go" id="go" href="#">네이버 지도 내비 시작</a>
 <a class="btn web" id="web" href="https://map.naver.com/">네이버 지도에서 보기</a>
 <script>
@@ -42,8 +43,8 @@
     : scheme;
   document.getElementById("go").href = url;
   document.getElementById("web").href = "https://map.naver.com/p/search/" + encodeURIComponent(name);
-  setTimeout(function () { location.href = url; }, 300);
-  setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 2500);
+  // 자동 넘김은 카톡 안 브라우저에서 카카오맵으로 새서 쓰지 않는다(11-04 시험) — 버튼을 눌러야 네이버 지도로 간다.
+  document.getElementById("msg").textContent = "아래 초록 버튼을 누르면 네이버 지도 내비가 시작됩니다.";
 })();
 </script>
 </body>
