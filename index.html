@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>길안내</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; padding: 24px 16px; font-family: -apple-system, "Malgun Gothic", sans-serif; background: #f5f6f8; color: #111; text-align: center; }
+  @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } }
+  h1 { font-size: 20px; margin: 8px 0 4px; }
+  p { margin: 4px 0 20px; color: #666; font-size: 14px; }
+  a.btn { display: block; max-width: 360px; margin: 10px auto; padding: 14px; border-radius: 10px; font-size: 17px; font-weight: 600; text-decoration: none; }
+  a.go { background: #03c75a; color: #fff; }
+  a.web { background: #fff; color: #03c75a; border: 1px solid #03c75a; }
+  @media (prefers-color-scheme: dark) { a.web { background: #111; } }
+</style>
+</head>
+<body>
+<h1 id="name">길안내</h1>
+<p id="msg">네이버 지도 내비를 여는 중…</p>
+<a class="btn go" id="go" href="#">네이버 지도 내비 시작</a>
+<a class="btn web" id="web" href="https://map.naver.com/">네이버 지도에서 보기</a>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var lat = parseFloat(q.get("lat")), lng = parseFloat(q.get("lng"));
+  var name = (q.get("name") || "목적지").slice(0, 40);
+  var ok = isFinite(lat) && isFinite(lng) && lat > 32 && lat < 39.5 && lng > 124 && lng < 132.5;
+  document.getElementById("name").textContent = name;
+  if (!ok) {
+    document.getElementById("msg").textContent = "목적지 좌표가 없습니다.";
+    document.getElementById("go").style.display = "none";
+    return;
+  }
+  var qs = "dlat=" + lat + "&dlng=" + lng + "&dname=" + encodeURIComponent(name) + "&appname=io.github.manwol0318.nav";
+  var scheme = "nmap://navigation?" + qs;
+  var android = /Android/i.test(navigator.userAgent);
+  var url = android
+    ? "intent://navigation?" + qs + "#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end"
+    : scheme;
+  document.getElementById("go").href = url;
+  document.getElementById("web").href = "https://map.naver.com/p/search/" + encodeURIComponent(name);
+  setTimeout(function () { location.href = url; }, 300);
+  setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 2500);
+})();
+</script>
+</body>
+</html>
