@@ -34,7 +34,18 @@
     document.getElementById("go").style.display = "none";
     return;
   }
-  var qs = "dlat=" + lat + "&dlng=" + lng + "&dname=" + encodeURIComponent(name) + "&appname=io.github.manwol0318.nav";
+  var qs = "dlat=" + lat + "&dlng=" + lng + "&dname=" + encodeURIComponent(name);
+  // 경유지 v1~v5 (네이버 지도 URL Scheme 경로 탐색 공통 파라미터)
+  var vias = [];
+  for (var i = 1; i <= 5; i++) {
+    var vlat = parseFloat(q.get("v" + i + "lat")), vlng = parseFloat(q.get("v" + i + "lng"));
+    if (!(isFinite(vlat) && isFinite(vlng) && vlat > 32 && vlat < 39.5 && vlng > 124 && vlng < 132.5)) break;
+    var vname = (q.get("v" + i + "name") || ("경유지" + i)).slice(0, 40);
+    qs += "&v" + i + "lat=" + vlat + "&v" + i + "lng=" + vlng + "&v" + i + "name=" + encodeURIComponent(vname);
+    vias.push(vname);
+  }
+  qs += "&appname=io.github.manwol0318.nav";
+  if (vias.length) document.getElementById("name").textContent = vias.join(" → ") + " → " + name;
   var scheme = "nmap://navigation?" + qs;
   var android = /Android/i.test(navigator.userAgent);
   var url = android
