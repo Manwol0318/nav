@@ -47,12 +47,26 @@
   qs += "&appname=io.github.manwol0318.nav";
   if (vias.length) document.getElementById("name").textContent = vias.join(" → ") + " → " + name;
   var scheme = "nmap://navigation?" + qs;
-  var android = /Android/i.test(navigator.userAgent);
+  var ua = navigator.userAgent;
+  var android = /Android/i.test(ua);
+  var mobile = android || /iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua));
+  // 컴퓨터 = 네이버 지도 웹 길찾기(목적지 좌표로, 네이버가 새 주소로 넘겨 줌)
+  var web = "https://map.naver.com/index.nhn?elng=" + lng + "&elat=" + lat +
+            "&etext=" + encodeURIComponent(name) + "&menu=route&pathType=0";
   var url = android
     ? "intent://navigation?" + qs + "#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end"
     : scheme;
+  document.getElementById("web").href = web;
+  if (!mobile) {
+    document.getElementById("msg").textContent = "네이버 지도 길찾기(웹)를 여는 중…";
+    document.getElementById("go").href = web;
+    document.getElementById("go").textContent = "네이버 지도 길찾기 열기";
+    document.getElementById("web").style.display = "none";
+    setTimeout(function () { location.href = web; }, 300);
+    setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 2500);
+    return;
+  }
   document.getElementById("go").href = url;
-  document.getElementById("web").href = "https://map.naver.com/p/search/" + encodeURIComponent(name);
   setTimeout(function () { location.href = url; }, 300);
   setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 2500);
 })();
