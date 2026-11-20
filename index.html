@@ -72,7 +72,7 @@
         clearTimeout(timer);
         open(web + "&slng=" + p.coords.longitude.toFixed(6) + "&slat=" + p.coords.latitude.toFixed(6) +
              "&stext=" + encodeURIComponent("내 위치"));
-      }, function () { clearTimeout(timer); open(web); }, { enableHighAccuracy: true, timeout: wait - 1000, maximumAge: 60000 });
+      }, function () { clearTimeout(timer); open(web); }, { enableHighAccuracy: false, timeout: wait - 1000, maximumAge: 600000 });
     };
     if (!navigator.geolocation) { open(web); return; }
     var start = function (state) {
