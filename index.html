@@ -58,12 +58,22 @@
     : scheme;
   document.getElementById("web").href = web;
   if (!mobile) {
-    document.getElementById("msg").textContent = "네이버 지도 길찾기(웹)를 여는 중…";
+    // 컴퓨터: 브라우저 위치(허용 시)를 출발지로, 못 받으면 목적지만 (재필님 11-20 "출발지는 안뜨네")
+    document.getElementById("msg").textContent = "내 위치를 확인하는 중… (위치 허용을 물으면 '허용')";
     document.getElementById("go").href = web;
     document.getElementById("go").textContent = "네이버 지도 길찾기 열기";
     document.getElementById("web").style.display = "none";
-    setTimeout(function () { location.href = web; }, 300);
-    setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 2500);
+    var went = false;
+    var open = function (u) { if (went) return; went = true; document.getElementById("go").href = u; location.href = u; };
+    var timer = setTimeout(function () { open(web); }, 8000);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (p) {
+        clearTimeout(timer);
+        open(web + "&slng=" + p.coords.longitude.toFixed(6) + "&slat=" + p.coords.latitude.toFixed(6) +
+             "&stext=" + encodeURIComponent("내 위치"));
+      }, function () { clearTimeout(timer); open(web); }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 });
+    } else { clearTimeout(timer); open(web); }
+    setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 9000);
     return;
   }
   document.getElementById("go").href = url;
