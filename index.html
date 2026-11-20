@@ -65,15 +65,25 @@
     document.getElementById("web").style.display = "none";
     var went = false;
     var open = function (u) { if (went) return; went = true; document.getElementById("go").href = u; location.href = u; };
-    var timer = setTimeout(function () { open(web); }, 8000);
-    if (navigator.geolocation) {
+    // 허용 전(prompt)이면 Chrome 이 주소창 위치 아이콘으로 조용히 물을 수 있어 30초 기다림, 허용돼 있으면 바로
+    var ask = function (wait) {
+      var timer = setTimeout(function () { open(web); }, wait);
       navigator.geolocation.getCurrentPosition(function (p) {
         clearTimeout(timer);
         open(web + "&slng=" + p.coords.longitude.toFixed(6) + "&slat=" + p.coords.latitude.toFixed(6) +
              "&stext=" + encodeURIComponent("내 위치"));
-      }, function () { clearTimeout(timer); open(web); }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 });
-    } else { clearTimeout(timer); open(web); }
-    setTimeout(function () { document.getElementById("msg").textContent = "자동으로 안 열리면 아래 초록 버튼을 누르세요."; }, 9000);
+      }, function () { clearTimeout(timer); open(web); }, { enableHighAccuracy: true, timeout: wait - 1000, maximumAge: 60000 });
+    };
+    if (!navigator.geolocation) { open(web); return; }
+    var start = function (state) {
+      if (state === "denied") { open(web); return; }
+      if (state === "prompt") document.getElementById("msg").textContent =
+        "위치 허용을 물어요 — 창 위 팝업이나 주소창 오른쪽 위치 아이콘에서 '허용'을 누르세요. (30초 뒤엔 목적지만으로 열림)";
+      ask(state === "granted" ? 10000 : 30000);
+    };
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: "geolocation" }).then(function (s) { start(s.state); }, function () { start("prompt"); });
+    } else start("prompt");
     return;
   }
   document.getElementById("go").href = url;
